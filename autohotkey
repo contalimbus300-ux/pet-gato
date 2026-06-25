@@ -1,0 +1,14 @@
+; Atalho para alternar click-through (ex: Ctrl+Alt+X)
+^!x::
+    WinGet, ExStyle, ExStyle, A
+    if (ExStyle & 0x80000)  ; WS_EX_TRANSPARENT
+    {
+        WinSet, Transparent, 255, A
+        WinSet, ExStyle, -0x80000, A
+    }
+    else
+    {
+        WinSet, Transparent, 150, A
+        WinSet, ExStyle, +0x80000, A
+    }
+return

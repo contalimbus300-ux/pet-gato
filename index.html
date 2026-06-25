@@ -1,0 +1,2164 @@
+<!DOCTYPE html>
+<!-- saved from url=(0089)file:///C:/Users/ESGC/Desktop/node%20do%20pet/node%20do%20pet%20-%20C%C3%B3pia/index.html -->
+<html lang="pt-PT"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src &#39;self&#39; &#39;unsafe-inline&#39; &#39;unsafe-eval&#39;; connect-src *; img-src * data:; script-src &#39;self&#39; &#39;unsafe-inline&#39; &#39;unsafe-eval&#39;">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gato Preto Motivador Desktop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: transparent;
+            width: 100vw;
+            height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        /* Campo de comando */
+        #petCommand {
+            padding: 7px 12px;
+            font-size: 13px;
+            border-radius: 8px;
+            border: 2px solid #999;
+            background: rgba(255, 255, 255, 0.98);
+            width: 200px;
+            min-width: 160px;
+            max-width: 260px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #petCommand:hover {
+            border-color: #ffbf00;
+            box-shadow: 0 5px 20px rgba(255, 191, 0, 0.2);
+        }
+
+        #petCommand:focus {
+            border-color: #ffbf00;
+            box-shadow: 0 7px 25px rgba(255, 191, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Container do comando */
+        #commandContainer {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2147483647;
+            padding: 4px 6px 6px 6px;
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 10px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            transition: opacity 0.3s ease;
+            user-select: none;
+        }
+
+        /* Handle de arrastar */
+        #dragHandle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 3px 0 5px 0;
+            cursor: grab;
+        }
+
+        #dragHandle:active {
+            cursor: grabbing;
+        }
+
+        #dragHandle span {
+            display: block;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.4);
+            transition: background 0.2s;
+        }
+
+        #dragHandle:hover span {
+            background: rgba(255,255,255,0.9);
+        }
+
+        /* Gato */
+        #pet {
+            position: fixed;
+            width: 120px;
+            height: 120px;
+            cursor: grab;
+            transition: transform 0.2s ease, opacity 0.3s ease;
+            z-index: 2147483645;
+            opacity: 1;
+        }
+
+        #pet:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+        }
+
+        #cat {
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+            filter: drop-shadow(0 3px 8px rgba(0,0,0,0.4));
+            pointer-events: none;
+        }
+
+        /* Balão de fala */
+        .bubble {
+            position: absolute;
+            bottom: 130px;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 8px 12px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: all 0.3s ease;
+            font-family: 'Comic Neue', cursive;
+            font-size: 11px;
+            font-weight: 500;
+            color: #333;
+            pointer-events: none;
+            z-index: 2147483646;
+            max-width: 150px;
+            text-align: center;
+            border: 1px solid #fff;
+        }
+
+        .bubble::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: rgba(255, 255, 255, 0.95);
+        }
+
+        .bubble.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Botões */
+        .show-commands-btn {
+            position: fixed;
+            background: rgba(255, 191, 0, 0.8);
+            color: #333;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 11px;
+            cursor: pointer;
+            z-index: 2147483647;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        .show-commands-btn:hover {
+            background: rgba(255, 191, 0, 1);
+        }
+
+        #showCommandsBtn {
+            top: 10px;
+            left: 10px;
+        }
+
+        #toggleVisibilityBtn {
+            top: 40px;
+            left: 10px;
+        }
+
+        /* Tabela de comandos */
+        #commandsTable {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 -3px 15px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            z-index: 2147483646;
+            max-width: 300px;
+            max-height: 400px;
+            display: none;
+            border: 1px solid #ddd;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1), opacity 0.3s ease;
+            opacity: 0;
+        }
+
+        #commandsTable.show {
+            display: block;
+            transform: translateY(0);
+            opacity: 1;
+            animation: slideUpFromBottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+
+        @keyframes slideUpFromBottom {
+            0% {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            70% {
+                transform: translateY(-10px);
+                opacity: 0.9;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .move-indicator {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .move-indicator.show {
+            opacity: 1;
+        }
+
+        /* Estilos para a tabela de comandos */
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .table-header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .commands-list {
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 12px;
+            scrollbar-width: thin;
+            scrollbar-color: #ffbf00 #f0f0f0;
+        }
+        
+        .commands-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .commands-list::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 3px;
+        }
+        
+        .commands-list::-webkit-scrollbar-thumb {
+            background: #ffbf00;
+            border-radius: 3px;
+        }
+        
+        .command-item {
+            margin: 6px 0;
+            padding: 5px 8px;
+            background: #f8f8f8;
+            border-radius: 4px;
+            border-left: 3px solid #ffbf00;
+            transition: all 0.2s ease;
+        }
+        
+        .command-item:hover {
+            background: #fff8e1;
+            transform: translateX(-3px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .command-item .cmd {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .command-item .desc {
+            color: #666;
+            margin-top: 2px;
+        }
+
+        /* Indicador de arrastar para tabela */
+        .table-drag-handle {
+            position: absolute;
+            top: -25px;
+            right: 20px;
+            background: rgba(255, 191, 0, 0.9);
+            color: #333;
+            padding: 4px 12px;
+            border-radius: 6px 6px 0 0;
+            font-size: 12px;
+            cursor: move;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+            font-weight: bold;
+            z-index: 2147483647;
+        }
+
+        .table-drag-handle:hover { opacity: 1; }
+
+        /* Painel de informação (tempo / bolsa / noticias) */
+        #infoPanel {
+            position: fixed;
+            top: 70px;
+            left: 10px;
+            width: 310px;
+            background: rgba(20,20,30,0.96);
+            border-radius: 12px;
+            box-shadow: 0 6px 28px rgba(0,0,0,0.45);
+            z-index: 2147483646;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            font-family: 'Segoe UI', sans-serif;
+            color: #f0f0f0;
+        }
+        #infoPanel.show { display: flex; }
+        #infoPanelHeader {
+            padding: 10px 14px;
+            font-weight: bold;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        #infoPanelHeaderLeft { display: flex; align-items: center; gap: 8px; }
+        #infoPanelRefresh {
+            cursor: pointer; background: none; border: none;
+            color: #888; font-size: 13px; padding: 0 2px;
+            transition: color 0.2s, transform 0.3s;
+        }
+        #infoPanelRefresh:hover { color: #ffbf00; }
+        #infoPanelRefresh.spinning { animation: spin 0.6s linear; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        #infoPanelCountdown {
+            font-size: 9px; color: #555; font-weight: normal;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        #infoPanelClose {
+            cursor: pointer; background: none; border: none;
+            color: #aaa; font-size: 16px; padding: 0 4px;
+        }
+        #infoPanelClose:hover { color: #fff; }
+        #infoPanelBody {
+            padding: 12px;
+            max-height: 340px;
+            overflow-y: auto;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        #infoPanelBody::-webkit-scrollbar { width: 4px; }
+        #infoPanelBody::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        .info-loading { color: #aaa; text-align: center; padding: 20px 0; }
+        .info-error   { color: #f87; text-align: center; padding: 14px; }
+        .info-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: #aaa; }
+        .info-value { font-weight: bold; color: #fff; }
+        .info-up   { color: #4caf50; }
+        .info-down { color: #f44336; }
+        .news-item { padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .news-item:last-child { border-bottom: none; }
+        .news-title { color: #fff; font-size: 12px; line-height: 1.4; }
+        .news-src   { color: #888; font-size: 10px; margin-top: 2px; }
+        .info-section-title { color: #ffbf00; font-size: 11px; font-weight: bold; margin: 8px 0 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    </style>
+</head>
+<body>
+    <button class="show-commands-btn" id="showCommandsBtn" title="Mostrar Comandos">📋 Comandos</button>
+    <button class="show-commands-btn" id="toggleVisibilityBtn" title="Alternar Visibilidade" style="top: 40px;">👁️</button>
+
+    <!-- Painel de informação reutilizável -->
+    <div id="infoPanel">
+        <div id="infoPanelHeader">
+            <div id="infoPanelHeaderLeft">
+                <span id="infoPanelTitle">Info</span>
+                <span id="infoPanelCountdown"></span>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center">
+                <button id="infoPanelRefresh" title="Atualizar agora">🔄</button>
+                <button id="infoPanelClose">✕</button>
+            </div>
+        </div>
+        <div id="infoPanelBody">
+            <div class="info-loading">A carregar...</div>
+        </div>
+    </div>
+    
+    <div id="commandsTable">
+        <div class="table-drag-handle" id="tableDragHandle">↕ Arrastar Tabela</div>
+        <div class="table-header">
+            <h3>📋 Comandos Disponíveis</h3>
+        </div>
+        <div class="commands-list" id="commandsList">
+            <!-- Comandos serão preenchidos via JavaScript -->
+        </div>
+    </div>
+    
+    <div id="pet" style="width: 120px; height: 120px; left: 252px; top: 399px;">
+        <div class="bubble" id="bubble">Cada passo importa! 🐾</div>
+        <canvas id="cat" width="40" height="40"></canvas>
+    </div>
+
+    <div id="commandContainer" style="left: 50%; top: calc(-70px + 100vh); transform: translateX(-50%);">
+        <div id="dragHandle">
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+        </div>
+        <input id="petCommand" placeholder="digite aqui">
+    </div>
+
+    <script>
+        // ========== CONFIGURAÇÕES ==========
+        const CONFIG = {
+            PET_SIZE: 120,
+            CANVAS_SIZE: 40,
+            GRAVITY: 600,
+            WALK_SPEED: 18,
+            JUMP_FORCE: -180,
+            MESSAGE_INTERVAL: 20000,
+            BLINK_INTERVAL: 5000,
+            FALL_ANIMATION_DURATION: 2000,
+            SLEEP_CHANCE: 0.002,
+            FALL_CHANCE: 0.001,
+            TALK_DURATION: 4000,
+            MOUTH_SPEED: 150
+        };
+
+        // ========== ELEMENTOS DO DOM ==========
+        const pet = document.getElementById('pet');
+        const canvas = document.getElementById('cat');
+        const ctx = canvas.getContext('2d');
+        const bubble = document.getElementById('bubble');
+        const petCommand = document.getElementById("petCommand");
+        const commandContainer = document.getElementById("commandContainer");
+        const dragHandle = document.getElementById("dragHandle");
+        const showCommandsBtn = document.getElementById("showCommandsBtn");
+        const commandsTable = document.getElementById("commandsTable");
+        const commandsList = document.getElementById("commandsList");
+        const toggleVisibilityBtn = document.getElementById('toggleVisibilityBtn');
+        const tableDragHandle = document.getElementById('tableDragHandle');
+
+        // ========== VARIÁVEIS DE INTERAÇÃO ==========
+        let isVisible = true;
+
+        // Abre URL no browser padrão do sistema
+        function openInBrowser(url) {
+            const { ipcRenderer } = require('electron');
+            ipcRenderer.send('open-url', url);
+        }
+        
+        // ========== ESTADO DA TABELA ==========
+        let tableState = {
+            isDragging: false,
+            dragOffsetX: 0,
+            dragOffsetY: 0,
+            startX: 0,
+            startY: 0
+        };
+
+        // ========== LISTA DE COMANDOS ATUALIZADA ==========
+        const COMMANDS_LIST = [
+            { cmd: "ajuda", desc: "Mostra esta lista de comandos" },
+            { cmd: "comandos", desc: "Mostra todos os comandos disponiveis" },
+            { cmd: "tempo", desc: "Mostra o tempo em Lisboa agora" },
+            { cmd: "bolsa", desc: "Mostra cotacoes do mercado (BTC, EUR/USD, S&P500)" },
+            { cmd: "noticias", desc: "Mostra as ultimas noticias portuguesas" },
+            { cmd: "abrir google", desc: "Abre o Google em nova aba" },
+            { cmd: "abrir youtube", desc: "Abre o YouTube em nova aba" },
+            { cmd: "abrir gmail", desc: "Abre o Gmail em nova aba" },
+            { cmd: "abrir github", desc: "Abre o GitHub em nova aba" },
+            { cmd: "abrir drive", desc: "Abre o Google Drive em nova aba" },
+            { cmd: "abrir definicoes", desc: "Abre as Definicoes do Windows" },
+            { cmd: "abrir calculadora", desc: "Abre a Calculadora do Windows" },
+            { cmd: "abrir cmd", desc: "Abre o Prompt de Comando (CMD)" },
+            { cmd: "abrir calendario", desc: "Abre o Calendario do Google" },
+            { cmd: "abrir office365", desc: "Abre o Office 365" },
+            { cmd: "abrir bluetooth", desc: "Abre as configuracoes de Bluetooth" },
+            { cmd: "abrir explorador", desc: "Abre o Explorador de Ficheiros" },
+            { cmd: "dizer [texto]", desc: "O gato fala o texto que voce digitar" },
+            { cmd: "posicao centro", desc: "Move o campo de comando para o centro" },
+            { cmd: "posicao canto", desc: "Move o campo de comando para o canto" },
+            { cmd: "fechar", desc: "Fecha a janela do pet" },
+            { cmd: "fechar tudo", desc: "Fecha TODAS as aplicacoes abertas" },
+            { cmd: "fechar aplicativo", desc: "Fecha o app aberto mais recentemente" },
+            { cmd: "marcar evento [titulo] [DD/MM] [HH:MM]", desc: "Abre o Google Calendar para criar evento" },
+            { cmd: "fechar chrome", desc: "Fecha o Google Chrome" },
+            { cmd: "fechar edge", desc: "Fecha o Microsoft Edge" },
+            { cmd: "fechar firefox", desc: "Fecha o Mozilla Firefox" },
+            { cmd: "fechar spotify", desc: "Fecha o Spotify" },
+            { cmd: "fechar discord", desc: "Fecha o Discord" },
+            { cmd: "fechar vscode", desc: "Fecha o Visual Studio Code" },
+            { cmd: "fechar whatsapp", desc: "Fecha o WhatsApp" },
+            { cmd: "fechar telegram", desc: "Fecha o Telegram" },
+            { cmd: "fechar word", desc: "Fecha o Microsoft Word" },
+            { cmd: "fechar excel", desc: "Fecha o Microsoft Excel" },
+            { cmd: "fechar powerpoint", desc: "Fecha o PowerPoint" },
+            { cmd: "fechar outlook", desc: "Fecha o Outlook" },
+            { cmd: "fechar teams", desc: "Fecha o Microsoft Teams" },
+            { cmd: "fechar zoom", desc: "Fecha o Zoom" },
+            { cmd: "fechar obs", desc: "Fecha o OBS Studio" },
+            { cmd: "fechar vlc", desc: "Fecha o VLC" },
+            { cmd: "fechar steam", desc: "Fecha o Steam" },
+            { cmd: "fechar notepad", desc: "Fecha o Bloco de Notas" },
+            { cmd: "fechar calculadora", desc: "Fecha a Calculadora" },
+        ];
+
+        // ========== MAPA DE PROCESSOS PARA FECHAR ==========
+        const CLOSE_COMMANDS = {
+            "fechar chrome":         ["chrome.exe"],
+            "fechar google chrome":  ["chrome.exe"],
+            "fechar edge":           ["msedge.exe"],
+            "fechar firefox":        ["firefox.exe"],
+            "fechar spotify":        ["Spotify.exe"],
+            "fechar discord":        ["Discord.exe"],
+            "fechar vscode":         ["Code.exe"],
+            "fechar code":           ["Code.exe"],
+            "fechar whatsapp":       ["WhatsApp.exe"],
+            "fechar telegram":       ["Telegram.exe"],
+            "fechar word":           ["WINWORD.EXE", "winword.exe"],
+            "fechar excel":          ["EXCEL.EXE", "excel.exe"],
+            "fechar powerpoint":     ["POWERPNT.EXE", "powerpnt.exe"],
+            "fechar outlook":        ["OUTLOOK.EXE", "outlook.exe"],
+            "fechar teams":          ["Teams.exe"],
+            "fechar zoom":           ["Zoom.exe"],
+            "fechar obs":            ["obs64.exe", "obs32.exe"],
+            "fechar vlc":            ["vlc.exe"],
+            "fechar steam":          ["steam.exe"],
+            "fechar notepad":        ["notepad.exe"],
+            "fechar bloco de notas": ["notepad.exe"],
+            "fechar calculadora":    ["calculator.exe", "Calculator.exe"],
+        };
+
+        // Apenas aplicações do utilizador — usadas pelo "fechar tudo"
+        const USER_APPS = [
+            "chrome.exe", "msedge.exe", "firefox.exe",
+            "Spotify.exe", "Discord.exe", "Code.exe",
+            "WhatsApp.exe", "Telegram.exe",
+            "WINWORD.EXE", "EXCEL.EXE", "POWERPNT.EXE", "OUTLOOK.EXE",
+            "Teams.exe", "Zoom.exe",
+            "obs64.exe", "obs32.exe",
+            "vlc.exe", "steam.exe",
+        ];
+
+        // ========== ESTADO DO GATO ==========
+        let state = {
+            posX: 100,
+            posY: window.innerHeight - 220,
+            velocityX: (Math.random() < 0.5 ? -1 : 1) * CONFIG.WALK_SPEED,
+            velocityY: 0,
+            lastTime: performance.now(),
+            frame: 0,
+            isIdle: false,
+            isDragging: false,
+            isSleeping: false,
+            isFalling: false,
+            isSitting: false,
+            isTalking: false,
+            blinkTimer: 0,
+            blinkCooldown: 0,
+            fallTimer: 0,
+            sleepTimer: 0,
+            talkTimer: 0,
+            mouthFrame: 0,
+            mouthAnimation: null,
+            isOnFloor: true
+        };
+
+        // ========== ESTADO DO CAMPO DE COMANDO ==========
+        let commandState = {
+            isDragging: false,
+            dragOffsetX: 0,
+            dragOffsetY: 0
+        };
+
+        // ========== MENSAGENS MOTIVADORAS ==========
+        const MOTIVATIONAL_MESSAGES = [
+            'Você consegue! 💪',
+            'Cada passo importa! 🐾',
+            'Continue assim! 🌟',
+            'Foco no objetivo! 🎯',
+            'Você é incrível! ✨',
+            'Não desista! 🏆',
+            'Respire e continue! 🌬️',
+            'Seu esforço vale a pena! 💫',
+            'Acredite em si mesmo! 🤗',
+            'Dia após dia, você evolui! 📈'
+        ];
+
+        // ========== CORES DO GATO ==========
+        const COLORS = {
+            black: '#1a1a1a',
+            dark_gray: '#2d2d2d',
+            medium_gray: '#3a3a3a',
+            eye_green: '#32cd32',
+            eye_highlight: '#90ee90',
+            nose: '#ff69b4',
+            tongue: '#ff8fa3',
+            mouth: '#ff4757',
+            white: '#ffffff',
+            zzz_yellow: '#ffd700'
+        };
+
+        // ========== CONTROLE DE INTERAÇÃO ==========
+        // Botão de alternar visibilidade
+        toggleVisibilityBtn.addEventListener('click', () => {
+            isVisible = !isVisible;
+            if (isVisible) {
+                pet.style.opacity = '0.7';
+                commandContainer.style.opacity = '1';
+                toggleVisibilityBtn.textContent = '👁️';
+                showMessage('Visibilidade normal');
+            } else {
+                pet.style.opacity = '0.3';
+                commandContainer.style.opacity = '0.5';
+                toggleVisibilityBtn.textContent = '👁️‍🗨️';
+                showMessage('Modo discreto ativado');
+            }
+        });
+
+        // ========== FUNÇÕES DA TABELA DE COMANDOS ==========
+        function showCommandsTable() {
+            commandsTable.classList.add('show');
+            commandsList.innerHTML = '';
+            
+            COMMANDS_LIST.forEach(command => {
+                const commandItem = document.createElement('div');
+                commandItem.className = 'command-item';
+                commandItem.innerHTML = `
+                    <div class="cmd">${command.cmd}</div>
+                    <div class="desc">${command.desc}</div>
+                `;
+                commandsList.appendChild(commandItem);
+            });
+        }
+
+        function hideCommandsTable() {
+            commandsTable.classList.remove('show');
+        }
+
+        // ========== FUNÇÃO PARA ABRIR APLICAÇÕES DO WINDOWS ==========
+        function openWindowsApp(appName) {
+            try {
+                const { ipcRenderer } = require('electron');
+                switch(appName.toLowerCase()) {
+                    case 'definições':
+                    case 'settings':
+                        ipcRenderer.send('open-windows-app', 'ms-settings:');
+                        return true;
+                        
+                    case 'calculadora':
+                    case 'calculator':
+                        ipcRenderer.send('open-windows-app', 'calculator:');
+                        return true;
+                        
+                    case 'cmd':
+                    case 'prompt':
+                        ipcRenderer.send('open-windows-app', 'cmd');
+                        return true;
+                        
+                    case 'calendario':
+                    case 'calendar':
+                        ipcRenderer.send('open-url', 'https://calendar.google.com');
+                        return true;
+                        
+                    case 'office365':
+                    case 'office':
+                        ipcRenderer.send('open-url', 'https://www.office.com');
+                        return true;
+                        
+                    case 'bluetooth':
+                        ipcRenderer.send('open-windows-app', 'ms-settings:bluetooth');
+                        return true;
+                        
+                    case 'explorador':
+                    case 'explorador de ficheiros':
+                    case 'file explorer':
+                        ipcRenderer.send('open-windows-app', 'explorer');
+                        return true;
+                }
+            } catch (error) {
+                console.log('Erro ao abrir aplicativo:', error);
+                showMessage('Não consegui abrir o aplicativo. Tente manualmente 😿');
+                return false;
+            }
+            return false;
+        }
+
+        // ========== FUNÇÕES DE DESENHO DO GATO ==========
+        function drawCat() {
+            ctx.clearRect(0, 0, CONFIG.CANVAS_SIZE, CONFIG.CANVAS_SIZE);
+            
+            const isBlinking = state.blinkTimer > 0;
+            const tailWag = !state.isIdle && !state.isSleeping && !state.isFalling && !state.isSitting && (state.frame % 8 < 4);
+            const walkAnimation = state.frame % 16;
+
+            if (state.isDragging) {
+                drawDraggedCat();
+            } else if (state.isSleeping) {
+                drawSleepingCat();
+            } else if (state.isFalling) {
+                drawFallingCat();
+            } else if (state.isSitting) {
+                drawSittingCat(isBlinking);
+            } else if (state.isTalking) {
+                drawTalkingCat(isBlinking, tailWag, walkAnimation);
+            } else {
+                drawWalkingCat(isBlinking, tailWag, walkAnimation);
+            }
+        }
+
+        function drawWalkingCat(isBlinking, tailWag, walkStep) {
+            drawCatBase(isBlinking, tailWag, walkStep, false);
+        }
+
+        function drawTalkingCat(isBlinking, tailWag, walkStep) {
+            drawCatBase(isBlinking, tailWag, walkStep, true);
+        }
+
+        function drawDraggedCat() {
+            const f = state.frame;
+            const bob  = Math.sin(f * 0.6) * 2;   // corpo a balançar
+            const hb   = Math.sin(f * 0.7) * 1.5; // cabeça a balançar
+            const pw   = f * 0.9;                  // velocidade das patas
+
+            // Gato inteiro ligeiramente a oscilar
+            ctx.save();
+            ctx.translate(20, 20);
+            ctx.rotate(Math.sin(f * 0.4) * 0.1);
+            ctx.translate(-20, -20);
+
+            // Cauda a abanar muito (susto/animado)
+            const tw = Math.sin(f * 0.5) * 7;
+            ctx.fillStyle = COLORS.black;
+            ctx.beginPath();
+            ctx.moveTo(28, 22 + bob);
+            ctx.bezierCurveTo(34 + tw, 15, 36 + tw, 9, 38, 5 + tw);
+            ctx.bezierCurveTo(36 + tw, 13, 32 + tw, 20, 28, 22 + bob);
+            ctx.fill();
+
+            // Corpo
+            ctx.fillStyle = COLORS.black;
+            ctx.beginPath();
+            ctx.ellipse(20, 24 + bob, 12, 8, 0, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Cabeça
+            ctx.beginPath();
+            ctx.arc(20, 12 + hb, 9, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Orelhas levantadas (susto)
+            ctx.beginPath();
+            ctx.moveTo(12, 3 + hb); ctx.lineTo(16, 10 + hb); ctx.lineTo(10, 10 + hb);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(28, 3 + hb); ctx.lineTo(24, 10 + hb); ctx.lineTo(30, 10 + hb);
+            ctx.fill();
+            ctx.fillStyle = COLORS.dark_gray;
+            ctx.beginPath();
+            ctx.moveTo(13, 4 + hb); ctx.lineTo(15, 9 + hb); ctx.lineTo(11, 9 + hb);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(27, 4 + hb); ctx.lineTo(25, 9 + hb); ctx.lineTo(29, 9 + hb);
+            ctx.fill();
+
+            // Olhos arregalados de susto
+            ctx.fillStyle = COLORS.eye_green;
+            ctx.beginPath();
+            ctx.ellipse(17, 11 + hb, 3, 3.5, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(23, 11 + hb, 3, 3.5, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.fillStyle = COLORS.eye_highlight;
+            ctx.fillRect(16, 10 + hb, 1, 1);
+            ctx.fillRect(22, 10 + hb, 1, 1);
+            // Pupilas contraídas (medo)
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(17, 11 + hb, 1, 1);
+            ctx.fillRect(23, 11 + hb, 1, 1);
+
+            // Nariz
+            ctx.fillStyle = COLORS.nose;
+            ctx.beginPath();
+            ctx.moveTo(19, 14 + hb);
+            ctx.lineTo(21, 14 + hb);
+            ctx.lineTo(20, 16 + hb);
+            ctx.fill();
+
+            // Boca aberta de susto com linguinha
+            ctx.fillStyle = COLORS.tongue;
+            ctx.beginPath();
+            ctx.ellipse(20, 19 + hb, 2, 1.5, 0, 0, Math.PI);
+            ctx.fill();
+            ctx.strokeStyle = COLORS.dark_gray;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(20, 18 + hb, 2, 0.1, Math.PI - 0.1);
+            ctx.stroke();
+
+            // Bigodes a tremer
+            ctx.strokeStyle = COLORS.medium_gray;
+            ctx.lineWidth = 1;
+            const ww = Math.sin(f * 1.5) * 1.2;
+            for (let i = 0; i < 3; i++) {
+                ctx.beginPath();
+                ctx.moveTo(12, 13 + hb + i * 2);
+                ctx.lineTo(6 + ww, 11 + hb + i * 1.5);
+                ctx.stroke();
+            }
+            for (let i = 0; i < 3; i++) {
+                ctx.beginPath();
+                ctx.moveTo(28, 13 + hb + i * 2);
+                ctx.lineTo(34 - ww, 11 + hb + i * 1.5);
+                ctx.stroke();
+            }
+
+            // Pata dianteira esquerda — abana para cima/baixo
+            ctx.save();
+            ctx.translate(15, 28 + bob);
+            ctx.rotate(Math.sin(pw) * 0.6);
+            ctx.fillStyle = COLORS.black;
+            ctx.fillRect(-1, 0, 3, 6);
+            ctx.fillStyle = COLORS.dark_gray;
+            ctx.fillRect(-1, 4, 3, 2);
+            ctx.restore();
+
+            // Pata dianteira direita — desfasada 180°
+            ctx.save();
+            ctx.translate(25, 28 + bob);
+            ctx.rotate(Math.sin(pw + Math.PI) * 0.6);
+            ctx.fillStyle = COLORS.black;
+            ctx.fillRect(-1, 0, 3, 6);
+            ctx.fillStyle = COLORS.dark_gray;
+            ctx.fillRect(-1, 4, 3, 2);
+            ctx.restore();
+
+            // Pata traseira esquerda — balança menos
+            ctx.save();
+            ctx.translate(17, 30 + bob);
+            ctx.rotate(Math.sin(pw * 0.7) * 0.35);
+            ctx.fillStyle = COLORS.black;
+            ctx.fillRect(-1, 0, 3, 8);
+            ctx.fillStyle = COLORS.dark_gray;
+            ctx.fillRect(-1, 6, 3, 2);
+            ctx.restore();
+
+            // Pata traseira direita — desfasada
+            ctx.save();
+            ctx.translate(23, 30 + bob);
+            ctx.rotate(Math.sin(pw * 0.7 + Math.PI) * 0.35);
+            ctx.fillStyle = COLORS.black;
+            ctx.fillRect(-1, 0, 3, 8);
+            ctx.fillStyle = COLORS.dark_gray;
+            ctx.fillRect(-1, 6, 3, 2);
+            ctx.restore();
+
+            ctx.restore(); // rotação geral
+        }
+
+        function drawCatBase(isBlinking, tailWag, walkStep, isTalking) {
+            ctx.fillStyle = COLORS.black;
+            
+            const bodyBob = Math.sin(state.frame * 0.3) * 1;
+            ctx.beginPath();
+            ctx.ellipse(20, 24 + bodyBob, 12, 8, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            const headBob = Math.sin(state.frame * 0.4) * 0.5;
+            ctx.beginPath();
+            ctx.arc(20, 12 + headBob, 9, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Orelhas
+            ctx.beginPath();
+            ctx.moveTo(13, 5 + headBob);
+            ctx.lineTo(17, 10 + headBob);
+            ctx.lineTo(11, 10 + headBob);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(27, 5 + headBob);
+            ctx.lineTo(23, 10 + headBob);
+            ctx.lineTo(29, 10 + headBob);
+            ctx.fill();
+            
+            // Orelhas internas
+            ctx.fillStyle = COLORS.dark_gray;
+            ctx.beginPath();
+            ctx.moveTo(14, 6 + headBob);
+            ctx.lineTo(16, 9 + headBob);
+            ctx.lineTo(12, 9 + headBob);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(26, 6 + headBob);
+            ctx.lineTo(24, 9 + headBob);
+            ctx.lineTo(28, 9 + headBob);
+            ctx.fill();
+            
+            // Olhos
+            if (!isBlinking) {
+                ctx.fillStyle = COLORS.eye_green;
+                ctx.beginPath();
+                ctx.ellipse(17, 11 + headBob, 2.5, 3, 0, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.ellipse(23, 11 + headBob, 2.5, 3, 0, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Brilho nos olhos
+                ctx.fillStyle = COLORS.eye_highlight;
+                ctx.fillRect(16, 10 + headBob, 1, 1);
+                ctx.fillRect(22, 10 + headBob, 1, 1);
+                
+                // Pupilas
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(16, 11 + headBob, 1, 2);
+                ctx.fillRect(22, 11 + headBob, 1, 2);
+            } else {
+                // Pálpebras fechadas
+                ctx.fillStyle = COLORS.black;
+                ctx.fillRect(15, 11 + headBob, 4, 1);
+                ctx.fillRect(21, 11 + headBob, 4, 1);
+            }
+            
+            // Nariz
+            ctx.fillStyle = COLORS.nose;
+            ctx.beginPath();
+            ctx.moveTo(19, 14 + headBob);
+            ctx.lineTo(21, 14 + headBob);
+            ctx.lineTo(20, 16 + headBob);
+            ctx.fill();
+            
+            // Boca
+            if (isTalking) {
+                drawTalkingMouth(20, 17 + headBob);
+            } else {
+                drawNormalMouth(20, 17 + headBob);
+            }
+            
+            // Bigodes
+            ctx.strokeStyle = COLORS.medium_gray;
+            ctx.lineWidth = 1;
+            const whiskerWave = Math.sin(state.frame * 0.5) * 0.3;
+            
+            for (let i = 0; i < 3; i++) {
+                ctx.beginPath();
+                ctx.moveTo(12, 13 + headBob + i * 2);
+                ctx.lineTo(8 + whiskerWave, 12 + i * 1.5);
+                ctx.stroke();
+            }
+            
+            for (let i = 0; i < 3; i++) {
+                ctx.beginPath();
+                ctx.moveTo(28, 13 + headBob + i * 2);
+                ctx.lineTo(32 - whiskerWave, 12 + i * 1.5);
+                ctx.stroke();
+            }
+            
+            // Patas
+            ctx.fillStyle = COLORS.black;
+            const legLift = Math.abs(Math.sin(walkStep * 0.4)) * 3;
+            
+            if (walkStep < 8) {
+                drawPaw(15, 30 + legLift, false, walkStep);
+                drawPaw(25, 32, false, walkStep);
+            } else {
+                drawPaw(15, 32, false, walkStep);
+                drawPaw(25, 30 + legLift, false, walkStep);
+            }
+            
+            drawPaw(18, 32, true, walkStep);
+            drawPaw(22, 32, true, walkStep);
+            
+            // Cauda
+            ctx.fillStyle = COLORS.black;
+            const tailWave = Math.sin(state.frame * 0.2) * 3;
+            if (tailWag) {
+                ctx.beginPath();
+                ctx.moveTo(28, 22);
+                ctx.bezierCurveTo(32 + tailWave, 18, 34 + tailWave, 15, 36, 12 + tailWave);
+                ctx.bezierCurveTo(34 + tailWave, 20, 30 + tailWave, 22, 28, 22);
+                ctx.fill();
+            } else {
+                ctx.beginPath();
+                ctx.moveTo(28, 22);
+                ctx.bezierCurveTo(32, 18, 34, 15, 36, 12);
+                ctx.bezierCurveTo(34, 20, 30, 22, 28, 22);
+                ctx.fill();
+            }
+        }
+
+        function drawNormalMouth(x, y) {
+            ctx.strokeStyle = COLORS.dark_gray;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(x, y, 2, 0.2, Math.PI - 0.2);
+            ctx.stroke();
+        }
+
+        function drawTalkingMouth(x, y) {
+            const mouthState = state.mouthFrame % 4;
+            
+            ctx.fillStyle = COLORS.tongue;
+            
+            if (mouthState === 0 || mouthState === 2) {
+                ctx.beginPath();
+                ctx.ellipse(x, y + 1, 2.5, 1.5, 0, 0, Math.PI);
+                ctx.fill();
+                
+                ctx.fillStyle = COLORS.mouth;
+                ctx.fillRect(x - 1, y + 0.5, 2, 1);
+            } else if (mouthState === 1) {
+                ctx.beginPath();
+                ctx.ellipse(x, y + 0.5, 2, 1, 0, 0, Math.PI);
+                ctx.fill();
+                
+                ctx.fillStyle = COLORS.mouth;
+                ctx.fillRect(x - 0.5, y, 1, 1);
+            } else {
+                ctx.beginPath();
+                ctx.ellipse(x, y, 1.5, 0.5, 0, 0, Math.PI);
+                ctx.fill();
+            }
+            
+            ctx.strokeStyle = COLORS.dark_gray;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            
+            if (mouthState === 0 || mouthState === 2) {
+                ctx.arc(x, y + 1, 2.5, 0.1, Math.PI - 0.1);
+            } else if (mouthState === 1) {
+                ctx.arc(x, y + 0.5, 2, 0.15, Math.PI - 0.15);
+            } else {
+                ctx.arc(x, y, 1.5, 0.2, Math.PI - 0.2);
+            }
+            ctx.stroke();
+        }
+
+        function drawPaw(x, y, isHind, step) {
+            ctx.fillStyle = COLORS.black;
+            const pawBob = Math.sin(step * 0.5) * 1;
+            
+            ctx.fillRect(x - 1, y + pawBob, 3, isHind ? 8 : 6);
+            
+            ctx.fillStyle = COLORS.dark_gray;
+            ctx.fillRect(x - 1, y + pawBob + (isHind ? 6 : 4), 3, 2);
+        }
+
+        function drawSleepingCat() {
+            ctx.fillStyle = COLORS.black;
+            
+            ctx.beginPath();
+            ctx.ellipse(20, 25, 14, 6, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(14, 22, 7, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(11, 18);
+            ctx.lineTo(14, 22);
+            ctx.lineTo(9, 22);
+            ctx.fill();
+            
+            ctx.fillStyle = COLORS.black;
+            ctx.fillRect(12, 21, 3, 1);
+            ctx.fillRect(15, 21, 3, 1);
+            
+            ctx.strokeStyle = COLORS.dark_gray;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(14, 24, 1, 0.1, Math.PI - 0.1);
+            ctx.stroke();
+            
+            ctx.fillStyle = COLORS.zzz_yellow;
+            const zOffset = (state.frame % 30) / 10;
+            
+            ctx.save();
+            ctx.translate(22, 18 - zOffset);
+            ctx.rotate(Math.sin(state.frame * 0.1) * 0.1);
+            ctx.fillRect(0, 0, 4, 1);
+            ctx.fillRect(0, 2, 4, 1);
+            ctx.fillRect(3, 1, 1, 1);
+            ctx.restore();
+            
+            ctx.save();
+            ctx.translate(26, 17 - zOffset);
+            ctx.rotate(Math.sin(state.frame * 0.1 + 1) * 0.1);
+            ctx.fillRect(0, 0, 4, 1);
+            ctx.fillRect(0, 2, 4, 1);
+            ctx.fillRect(3, 1, 1, 1);
+            ctx.restore();
+            
+            ctx.save();
+            ctx.translate(30, 16 - zOffset);
+            ctx.rotate(Math.sin(state.frame * 0.1 + 2) * 0.1);
+            ctx.fillRect(0, 0, 4, 1);
+            ctx.fillRect(0, 2, 4, 1);
+            ctx.fillRect(3, 1, 1, 1);
+            ctx.restore();
+            
+            ctx.fillStyle = COLORS.black;
+            ctx.fillRect(16, 28, 3, 4);
+            ctx.fillRect(21, 28, 3, 4);
+        }
+
+        function drawFallingCat() {
+            ctx.fillStyle = COLORS.black;
+            
+            const fallProgress = state.fallTimer / CONFIG.FALL_ANIMATION_DURATION;
+            const stretch = 1 + fallProgress * 0.5;
+            
+            ctx.beginPath();
+            ctx.ellipse(20, 24, 12 * stretch, 8 / stretch, Math.PI/4 * fallProgress, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(20, 12, 9, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(12, 6);
+            ctx.lineTo(15, 10);
+            ctx.lineTo(10, 10);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(28, 6);
+            ctx.lineTo(25, 10);
+            ctx.lineTo(30, 10);
+            ctx.fill();
+            
+            ctx.fillStyle = COLORS.eye_green;
+            ctx.beginPath();
+            ctx.ellipse(17, 11, 3, 3.5, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.ellipse(23, 11, 3, 3.5, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(16, 11, 2, 2);
+            ctx.fillRect(22, 11, 2, 2);
+            
+            ctx.fillStyle = COLORS.tongue;
+            ctx.beginPath();
+            ctx.ellipse(20, 16, 3, 2, 0, 0, Math.PI);
+            ctx.fill();
+            
+            ctx.fillStyle = COLORS.mouth;
+            ctx.fillRect(18, 15, 4, 1);
+            
+            ctx.strokeStyle = COLORS.dark_gray;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(20, 16, 3, 0.1, Math.PI - 0.1);
+            ctx.stroke();
+            
+            const pawSpread = fallProgress * 3;
+            ctx.fillStyle = COLORS.black;
+            
+            ctx.fillRect(15 - pawSpread, 28, 3, 6);
+            ctx.fillRect(22 + pawSpread, 28, 3, 6);
+            
+            ctx.fillRect(17, 30, 3, 8);
+            ctx.fillRect(20, 30, 3, 8);
+            
+            ctx.beginPath();
+            ctx.moveTo(28, 22);
+            ctx.bezierCurveTo(32, 15, 34, 10, 36, 5);
+            ctx.bezierCurveTo(34, 15, 30, 20, 28, 22);
+            ctx.fill();
+            
+            if (fallProgress > 0.3) {
+                ctx.strokeStyle = COLORS.white;
+                ctx.lineWidth = 1;
+                for (let i = 0; i < 3; i++) {
+                    const windOffset = (state.frame + i * 10) % 20;
+                    ctx.beginPath();
+                    ctx.moveTo(5, 15 + i * 5);
+                    ctx.lineTo(10 + windOffset, 12 + i * 5);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function drawSittingCat(isBlinking) {
+            ctx.fillStyle = COLORS.black;
+            ctx.beginPath();
+            ctx.ellipse(20, 25, 10, 6, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(20, 15, 8, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            if (!isBlinking) {
+                ctx.fillStyle = COLORS.eye_green;
+                ctx.beginPath();
+                ctx.ellipse(17, 14, 2, 2.5, 0, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.ellipse(23, 14, 2, 2.5, 0, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+            
+            drawNormalMouth(20, 17);
+            
+            ctx.fillStyle = COLORS.black;
+            ctx.fillRect(18, 28, 4, 4);
+            ctx.fillRect(22, 28, 4, 4);
+        }
+
+        // ========== FUNÇÕES PRINCIPAIS ==========
+        function showMessage(text = null) {
+            if (state.isSleeping || state.isFalling) return;
+            
+            if (!text) {
+                text = MOTIVATIONAL_MESSAGES[Math.floor(Math.random() * MOTIVATIONAL_MESSAGES.length)];
+            }
+            
+            state.isTalking = true;
+            state.talkTimer = 0;
+            state.mouthFrame = 0;
+            
+            bubble.textContent = text;
+            bubble.classList.add('show');
+            
+            if (state.mouthAnimation) {
+                clearInterval(state.mouthAnimation);
+            }
+            
+            state.mouthAnimation = setInterval(() => {
+                state.mouthFrame++;
+            }, CONFIG.MOUTH_SPEED);
+            
+            setTimeout(() => {
+                stopTalking();
+                bubble.classList.remove('show');
+            }, CONFIG.TALK_DURATION);
+        }
+
+        function stopTalking() {
+            state.isTalking = false;
+            state.talkTimer = 0;
+            if (state.mouthAnimation) {
+                clearInterval(state.mouthAnimation);
+                state.mouthAnimation = null;
+            }
+        }
+
+        // ========== FÍSICA E MOVIMENTO DO GATO ==========
+        function updatePhysics(deltaTime) {
+            const floor = window.innerHeight - CONFIG.PET_SIZE;
+            state.isOnFloor = state.posY >= floor - 1;
+            
+            state.velocityY += CONFIG.GRAVITY * deltaTime;
+            state.posY += state.velocityY * deltaTime;
+            
+            if (state.posY > floor) {
+                state.posY = floor;
+                state.velocityY = 0;
+                state.isOnFloor = true;
+                
+                if (state.isFalling) {
+                    state.isFalling = false;
+                    state.fallTimer = 0;
+                    showMessage('Ufa! Cai de pé como um gato! 😼');
+                }
+            }
+            
+            if (!state.isDragging && !state.isSleeping && !state.isFalling) {
+                state.posX += state.velocityX * deltaTime;
+                
+                // Limites da tela
+                state.posX = Math.max(0, Math.min(state.posX, window.innerWidth - CONFIG.PET_SIZE));
+                state.posY = Math.max(0, Math.min(state.posY, window.innerHeight - CONFIG.PET_SIZE));
+                
+                if (state.posX <= 0) {
+                    state.posX = 0;
+                    state.velocityX = Math.abs(state.velocityX);
+                }
+                if (state.posX + CONFIG.PET_SIZE >= window.innerWidth) {
+                    state.posX = window.innerWidth - CONFIG.PET_SIZE;
+                    state.velocityX = -Math.abs(state.velocityX);
+                }
+            }
+        }
+
+        // ========== SISTEMA DE ANIMAÇÃO ==========
+        function updateAnimation() {
+            state.frame++;
+            
+            if (state.blinkCooldown <= 0 && Math.random() < 0.002) {
+                state.blinkTimer = 8;
+                state.blinkCooldown = CONFIG.BLINK_INTERVAL / 16.67;
+            }
+            
+            if (state.blinkTimer > 0) state.blinkTimer--;
+            if (state.blinkCooldown > 0) state.blinkCooldown--;
+            
+            if (state.isFalling) {
+                state.fallTimer += 16.67;
+                if (state.fallTimer > CONFIG.FALL_ANIMATION_DURATION) {
+                    state.isFalling = false;
+                    state.fallTimer = 0;
+                }
+            }
+            
+            if (state.isSleeping) {
+                state.sleepTimer++;
+                if (state.sleepTimer > 900 + Math.random() * 600) {
+                    state.isSleeping = false;
+                    state.sleepTimer = 0;
+                    showMessage('Hmm? Já estou acordado! 🌞');
+                }
+            }
+            
+            if (state.isTalking) {
+                state.talkTimer++;
+                if (state.talkTimer > CONFIG.TALK_DURATION / 16.67) {
+                    stopTalking();
+                }
+            }
+            
+            if (!state.isSleeping && !state.isFalling && !state.isDragging && state.isOnFloor) {
+                if (Math.random() < CONFIG.SLEEP_CHANCE) {
+                    state.isSleeping = true;
+                    state.sleepTimer = 0;
+                    showMessage('Zzz... Hora da soneca... 😴');
+                }
+            }
+        }
+
+        // ========== RENDERIZAÇÃO ==========
+        function render() {
+            drawCat();
+            pet.style.left = Math.round(state.posX) + 'px';
+            pet.style.top = Math.round(state.posY) + 'px';
+        }
+
+        // ========== LOOP PRINCIPAL ==========
+        function gameLoop(currentTime) {
+            const deltaTime = Math.min(0.04, (currentTime - state.lastTime) / 1000);
+            state.lastTime = currentTime;
+            
+            updatePhysics(deltaTime);
+            updateAnimation();
+            render();
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        // ========== FUNÇÃO DE EXECUTAR COMANDOS ==========
+        function executePetCommand(cmd) {
+            console.log("Comando recebido:", cmd);
+            
+            const command = cmd.toLowerCase().trim();
+            
+            // Comandos de ajuda
+            if (command === "ajuda" || command === "comandos") {
+                showCommandsTable();
+                showMessage("Aqui estão todos os comandos disponíveis! 📋😺");
+                return;
+            }
+
+            // ── TEMPO ──────────────────────────────────────────────
+            if (command === "tempo" || command === "clima" || command === "meteorologia") {
+                showMessage("A verificar o tempo em Lisboa... ☁️😺");
+                fetchTempo();
+                return;
+            }
+
+            // ── BOLSA ──────────────────────────────────────────────
+            if (command === "bolsa" || command === "mercado" || command === "acoes" || command === "ações") {
+                showMessage("A buscar cotações... 📈😺");
+                fetchBolsa();
+                return;
+            }
+
+            // ── NOTICIAS ───────────────────────────────────────────
+            if (command === "noticias" || command === "notícias" || command === "news") {
+                showMessage("A buscar notícias... 📰😺");
+                fetchNoticias();
+                return;
+            }
+            
+            // Comandos de abrir sites
+            if (command === "abrir google") {
+                openInBrowser("https://www.google.com");
+                showMessage("Abrindo o Google 😺🔍");
+                return;
+            }
+
+            if (command === "abrir youtube") {
+                openInBrowser("https://www.youtube.com");
+                showMessage("Abrindo o YouTube ▶️🐾");
+                return;
+            }
+
+            if (command === "abrir github") {
+                openInBrowser("https://github.com");
+                showMessage("Abrindo o GitHub 😺💻");
+                return;
+            }
+            
+            if (command === "abrir gmail") {
+                openInBrowser("https://mail.google.com");
+                showMessage("Abrindo o Gmail 📧😺");
+                return;
+            }
+            
+            if (command === "abrir drive") {
+                openInBrowser("https://drive.google.com");
+                showMessage("Abrindo o Google Drive 💾😺");
+                return;
+            }
+            
+            // Comandos do Windows
+            if (command === "abrir definições" || command === "abrir definicoes" || command === "abrir configurações" || command === "abrir configuracoes") {
+                if (openWindowsApp('definições')) {
+                    showMessage("Abrindo as Definições do Windows ⚙️😺");
+                }
+                return;
+            }
+            
+            if (command === "abrir calculadora") {
+                if (openWindowsApp('calculadora')) {
+                    showMessage("Abrindo a Calculadora 🧮😺");
+                }
+                return;
+            }
+            
+            if (command === "abrir cmd" || command === "abrir prompt") {
+                if (openWindowsApp('cmd')) {
+                    showMessage("Abrindo o Prompt de Comando 💻😺");
+                }
+                return;
+            }
+            
+            if (command === "abrir calendario" || command === "abrir calendar") {
+                if (openWindowsApp('calendario')) {
+                    showMessage("Abrindo o Calendário 📅😺");
+                }
+                return;
+            }
+            
+            if (command === "abrir office365" || command === "abrir office") {
+                if (openWindowsApp('office365')) {
+                    showMessage("Abrindo o Office 365 📊😺");
+                }
+                return;
+            }
+            
+            if (command === "abrir bluetooth") {
+                if (openWindowsApp('bluetooth')) {
+                    showMessage("Abrindo configurações Bluetooth 📱😺");
+                }
+                return;
+            }
+            
+            if (command === "abrir explorador" || command === "abrir explorador de ficheiros") {
+                if (openWindowsApp('explorador')) {
+                    showMessage("Abrindo o Explorador de Ficheiros 📁😺");
+                }
+                return;
+            }
+            
+            // Comando dizer
+            if (command.startsWith("dizer ")) {
+                const text = command.substring(6);
+                showMessage(text);
+                return;
+            }
+            
+            // Comandos de posição
+            if (command === "posicao centro") {
+                commandContainer.style.left = '50%';
+                commandContainer.style.top = 'calc(100vh - 80px)';
+                commandContainer.style.transform = 'translateX(-50%)';
+                showMessage("Campo movido para o centro! 🎯");
+                return;
+            }
+            
+            if (command === "posicao canto") {
+                commandContainer.style.left = '20px';
+                commandContainer.style.top = '20px';
+                commandContainer.style.transform = 'none';
+                showMessage("Campo movido para o canto! 📍");
+                return;
+            }
+            
+            // Comando fechar o pet
+            if (command === "fechar" || command === "sair") {
+                if (confirm("Tem certeza que quer fechar o gatinho? 😿")) {
+                    const { ipcRenderer } = require('electron');
+                    ipcRenderer.send('close-app');
+                }
+                return;
+            }
+
+            // Comando marcar evento
+            if (command.startsWith("marcar evento") || command.startsWith("criar evento") || command.startsWith("novo evento")) {
+                const { ipcRenderer } = require('electron');
+
+                const dateMatch = command.match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/);
+                const timeMatch = command.match(/(\d{1,2}):(\d{2})/);
+
+                if (!dateMatch) {
+                    showMessage("Indica a data! Ex: marcar evento Reunião 15/03 14:30 📅");
+                    return;
+                }
+                if (!timeMatch) {
+                    showMessage("Indica a hora! Ex: marcar evento Reunião 15/03 14:30 🕐");
+                    return;
+                }
+
+                const day    = parseInt(dateMatch[1]);
+                const month  = parseInt(dateMatch[2]);
+                const yearRaw = dateMatch[3];
+                const year   = yearRaw
+                    ? (yearRaw.length === 2 ? 2000 + parseInt(yearRaw) : parseInt(yearRaw))
+                    : new Date().getFullYear();
+                const hour   = parseInt(timeMatch[1]);
+                const min    = parseInt(timeMatch[2]);
+
+                if (day < 1 || day > 31)    { showMessage("Dia inválido! 😿"); return; }
+                if (month < 1 || month > 12) { showMessage("Mês inválido! 😿"); return; }
+                if (hour < 0 || hour > 23)  { showMessage("Hora inválida! 😿"); return; }
+                if (min  < 0 || min  > 59)  { showMessage("Minutos inválidos! 😿"); return; }
+
+                const prefix = command.match(/^(marcar|criar|novo) evento\s*/i);
+                let titulo = command
+                    .slice(prefix ? prefix[0].length : 0)
+                    .replace(/\d{1,2}\/\d{1,2}(?:\/\d{2,4})?/, '')
+                    .replace(/\d{1,2}:\d{2}/, '')
+                    .replace(/\s+/g, ' ').trim();
+                if (!titulo) titulo = 'Evento';
+
+                const pad     = n => String(n).padStart(2, '0');
+                const startdt = `${year}-${pad(month)}-${pad(day)}T${pad(hour)}:${pad(min)}:00`;
+                const endHour = (hour + 1) < 24 ? hour + 1 : hour;
+                const enddt   = `${year}-${pad(month)}-${pad(day)}T${pad(endHour)}:${pad(min)}:00`;
+
+                ipcRenderer.invoke('create-calendar-event', { titulo, startdt, enddt });
+                showMessage(`Google Calendar aberto! Clica Guardar no browser 📅`);
+                return;
+            }
+
+            // Comando fechar aplicativo (app aberto mais recentemente)
+            if (command === "fechar aplicativo" || command === "fechar app") {
+                const { ipcRenderer } = require('electron');
+                ipcRenderer.invoke('get-recent-app').then(app => {
+                    if (!app) {
+                        showMessage("Não há nenhum app recente para fechar 😿");
+                        return;
+                    }
+                    showMessage(`A fechar ${app.name}... 🐱`);
+                    ipcRenderer.invoke('close-recent-app').then(result => {
+                        if (result && result.success) {
+                            showMessage(`${result.appName} fechado! ✅`);
+                        } else {
+                            showMessage(`Não consegui fechar 😿`);
+                        }
+                    });
+                });
+                return;
+            }
+
+            // Comando fechar tudo
+            if (command === "fechar tudo") {
+                const { ipcRenderer } = require('electron');
+                showMessage("A detetar aplicações... 🐱");
+                ipcRenderer.invoke('get-running-apps').then(apps => {
+                    if (!apps || apps.length === 0) {
+                        showMessage("Não há nenhuma aplicação aberta! 😸");
+                        return;
+                    }
+                    showMessage(`A fechar ${apps.length} app(s)... 😼`);
+                    let fechados = 0;
+                    let i = 0;
+                    function fecharProximo() {
+                        if (i >= apps.length) {
+                            showMessage(fechados > 0
+                                ? `Fechei ${fechados} app(s)! ✅`
+                                : "Não consegui fechar nenhum 😿");
+                            return;
+                        }
+                        ipcRenderer.invoke('close-app-by-name', apps[i].pid).then(r => {
+                            if (r && r.success) fechados++;
+                            i++;
+                            fecharProximo();
+                        });
+                    }
+                    fecharProximo();
+                }).catch(() => showMessage("Erro ao detetar aplicações 😿"));
+                return;
+            }
+
+            // Comandos fechar [aplicacao]
+            if (CLOSE_COMMANDS[command]) {
+                const procList = CLOSE_COMMANDS[command];
+                const appName  = command.replace("fechar ", "");
+                const { ipcRenderer } = require('electron');
+                showMessage(`A fechar ${appName}... 🐱`);
+                // Tentar fechar cada executável da lista
+                Promise.all(procList.map(proc =>
+                    ipcRenderer.invoke('close-app-by-name', proc.replace('.exe','').replace('.EXE',''))
+                )).then(results => {
+                    const ok = results.some(r => r && r.success);
+                    showMessage(ok ? `${appName} fechado! ✅` : `${appName} não estava aberto 😿`);
+                });
+                return;
+            }
+
+            // Diagnóstico do calendário
+            if (command === "diagnostico calendario" || command === "diagnostico" || command === "diagnóstico calendário") {
+                const { ipcRenderer } = require('electron');
+                showMessage("A verificar calendário... 🔍");
+                ipcRenderer.invoke('diagnostico-calendario').then(r => {
+                    if (r.ics) {
+                        showMessage("App de calendário encontrada! Usa: marcar evento 📅✅");
+                    } else {
+                        showMessage("Vou usar Google Calendar no browser 🌐✅");
+                    }
+                    console.log('Diagnóstico calendário:', r);
+                });
+                return;
+            }
+
+            // Se nenhum comando reconhecido
+            showMessage("Comando nao reconhecido. Digite 'ajuda' para opcoes 😿");
+        }
+
+        // ========== EVENT LISTENERS ==========
+        petCommand.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                const cmd = petCommand.value.trim();
+                petCommand.value = "";
+                if (cmd) {
+                    executePetCommand(cmd);
+                }
+            }
+        });
+
+        // Arrastar gato
+        let dragOffsetX = 0, dragOffsetY = 0;
+
+        pet.addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            state.isDragging = true;
+            dragOffsetX = e.clientX - state.posX;
+            dragOffsetY = e.clientY - state.posY;
+            state.velocityY = 0;
+            state.isSleeping = false;
+            state.isSitting = false;
+            state.isFalling = false;
+            stopTalking();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (state.isDragging) {
+                state.posX = e.clientX - dragOffsetX;
+                state.posY = e.clientY - dragOffsetY;
+                
+                state.posX = Math.max(0, Math.min(state.posX, window.innerWidth - CONFIG.PET_SIZE));
+                state.posY = Math.max(0, Math.min(state.posY, window.innerHeight - CONFIG.PET_SIZE));
+            }
+            
+            if (commandState.isDragging) {
+                let newX = e.clientX - commandState.dragOffsetX;
+                let newY = e.clientY - commandState.dragOffsetY;
+                
+                const containerWidth = commandContainer.offsetWidth;
+                const containerHeight = commandContainer.offsetHeight;
+                
+                newX = Math.max(0, Math.min(newX, window.innerWidth - containerWidth));
+                newY = Math.max(0, Math.min(newY, window.innerHeight - containerHeight));
+                
+                commandContainer.style.left = newX + 'px';
+                commandContainer.style.top = newY + 'px';
+                commandContainer.style.transform = 'none';
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (state.isDragging) {
+                state.isDragging = false;
+                if (state.posY < window.innerHeight - CONFIG.PET_SIZE - 10) {
+                    state.velocityY = CONFIG.JUMP_FORCE * 0.4;
+                }
+            }
+            if (commandState.isDragging) {
+                commandState.isDragging = false;
+                document.body.style.userSelect = '';
+            }
+        });
+
+        // Arrastar campo de comando pelo handle
+        dragHandle.addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            commandState.isDragging = true;
+            const rect = commandContainer.getBoundingClientRect();
+            commandState.dragOffsetX = e.clientX - rect.left;
+            commandState.dragOffsetY = e.clientY - rect.top;
+            document.body.style.userSelect = 'none';
+        });
+
+        // Arrastar a tabela
+        tableDragHandle.addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            tableState.isDragging = true;
+            const rect = commandsTable.getBoundingClientRect();
+            tableState.dragOffsetX = e.clientX - rect.left;
+            tableState.dragOffsetY = e.clientY - rect.top;
+        });
+
+        // Movimento da tabela
+        document.addEventListener('mousemove', (e) => {
+            if (tableState.isDragging) {
+                let newX = e.clientX - tableState.dragOffsetX;
+                let newY = e.clientY - tableState.dragOffsetY;
+                
+                const containerWidth = commandsTable.offsetWidth;
+                const containerHeight = commandsTable.offsetHeight;
+                
+                newX = Math.max(0, Math.min(newX, window.innerWidth - containerWidth));
+                newY = Math.max(0, Math.min(newY, window.innerHeight - containerHeight));
+                
+                commandsTable.style.right = 'auto';
+                commandsTable.style.bottom = 'auto';
+                commandsTable.style.left = newX + 'px';
+                commandsTable.style.top = newY + 'px';
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (tableState.isDragging) {
+                tableState.isDragging = false;
+            }
+        });
+
+        // Botões
+        showCommandsBtn.addEventListener('click', () => {
+            showCommandsTable();
+        });
+
+        // Fechar tabela apenas quando clicar fora dela e não no campo de entrada
+        document.addEventListener('click', (e) => {
+            if (commandsTable.classList.contains('show') && 
+                !commandsTable.contains(e.target) && 
+                e.target !== showCommandsBtn &&
+                e.target !== petCommand &&
+                e.target !== tableDragHandle) {
+                hideCommandsTable();
+            }
+        });
+
+        // ========== INICIALIZAÇÃO ==========
+        function init() {
+            pet.style.width = CONFIG.PET_SIZE + 'px';
+            pet.style.height = CONFIG.PET_SIZE + 'px';
+            canvas.width = CONFIG.CANVAS_SIZE;
+            canvas.height = CONFIG.CANVAS_SIZE;
+            
+            state.posX = Math.random() * (window.innerWidth - CONFIG.PET_SIZE);
+            state.posY = window.innerHeight - CONFIG.PET_SIZE;
+            
+            // Iniciar o loop do jogo
+            requestAnimationFrame(gameLoop);
+            
+            setTimeout(() => {
+                showMessage('Olá! Sou seu gato motivador! 😺\nVamos ter um ótimo dia!');
+            }, 1000);
+            
+            setInterval(() => {
+                if (!state.isSleeping && !state.isFalling) {
+                    showMessage();
+                }
+            }, CONFIG.MESSAGE_INTERVAL);
+        }
+
+        window.addEventListener('load', init);
+        window.addEventListener('resize', () => {
+            state.posY = Math.min(state.posY, window.innerHeight - CONFIG.PET_SIZE);
+        });
+
+        // ── CONTROLO DO RATO ─────────────────────────────────────────
+        // ── Passthrough: verifica TODOS os elementos interativos ──
+        const ipc = require('electron').ipcRenderer;
+        let overInteractive = false;
+
+        function isOverEl(e, el) {
+            if (!el) return false;
+            const r = el.getBoundingClientRect();
+            return e.clientX >= r.left && e.clientX <= r.right &&
+                   e.clientY >= r.top  && e.clientY <= r.bottom;
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            const nowOver = (
+                isOverEl(e, pet) ||
+                isOverEl(e, commandContainer) ||
+                isOverEl(e, commandsTable) ||
+                isOverEl(e, showCommandsBtn) ||
+                isOverEl(e, toggleVisibilityBtn) ||
+                isOverEl(e, document.getElementById('infoPanel'))
+            );
+            if (nowOver !== overInteractive) {
+                overInteractive = nowOver;
+                if (!state.isDragging) ipc.send('set-mouse-passthrough', !nowOver);
+            }
+        });
+
+        // ═══════════════════════════════════════════════════════════
+        // PAINEL DE INFORMAÇÃO
+        // ═══════════════════════════════════════════════════════════
+        const infoPanel      = document.getElementById('infoPanel');
+        const infoPanelTitle     = document.getElementById('infoPanelTitle');
+        const infoPanelBody      = document.getElementById('infoPanelBody');
+        const infoPanelClose     = document.getElementById('infoPanelClose');
+        const infoPanelRefresh   = document.getElementById('infoPanelRefresh');
+        const infoPanelCountdown = document.getElementById('infoPanelCountdown');
+
+        // Estado do auto-refresh
+        let activeMode      = null;   // 'tempo' | 'bolsa' | 'noticias'
+        let refreshInterval = null;   // setInterval do refresh automático
+        let countdownInterval = null; // setInterval do contador visual
+        let nextRefreshAt   = 0;      // timestamp da próxima atualização
+
+        // Intervalos de atualização automática
+        const REFRESH_INTERVALS = {
+            tempo:    10 * 60 * 1000,  // 10 minutos
+            bolsa:     1 * 60 * 1000,  // 1 minuto
+            noticias: 15 * 60 * 1000,  // 15 minutos
+        };
+
+        function clearAutoRefresh() {
+            if (refreshInterval)  clearInterval(refreshInterval);
+            if (countdownInterval) clearInterval(countdownInterval);
+            refreshInterval = null;
+            countdownInterval = null;
+            infoPanelCountdown.textContent = '';
+        }
+
+        function startAutoRefresh(mode, fetchFn) {
+            clearAutoRefresh();
+            activeMode = mode;
+            const interval = REFRESH_INTERVALS[mode];
+            nextRefreshAt = Date.now() + interval;
+
+            // Atualização automática
+            refreshInterval = setInterval(() => {
+                if (infoPanel.classList.contains('show')) {
+                    fetchFn();
+                    nextRefreshAt = Date.now() + interval;
+                }
+            }, interval);
+
+            // Contador visual no header
+            countdownInterval = setInterval(() => {
+                const secsLeft = Math.max(0, Math.round((nextRefreshAt - Date.now()) / 1000));
+                if (secsLeft < 60) {
+                    infoPanelCountdown.textContent = `↻ ${secsLeft}s`;
+                } else {
+                    const mins = Math.floor(secsLeft / 60);
+                    const secs = secsLeft % 60;
+                    infoPanelCountdown.textContent = `↻ ${mins}m${secs > 0 ? secs + 's' : ''}`;
+                }
+            }, 1000);
+        }
+
+        infoPanelClose.addEventListener('click', () => {
+            infoPanel.classList.remove('show');
+            clearAutoRefresh();
+            activeMode = null;
+        });
+
+        infoPanelRefresh.addEventListener('click', () => {
+            if (!activeMode) return;
+            // Animação de rotação
+            infoPanelRefresh.classList.add('spinning');
+            setTimeout(() => infoPanelRefresh.classList.remove('spinning'), 600);
+            // Reiniciar o contador
+            nextRefreshAt = Date.now() + REFRESH_INTERVALS[activeMode];
+            // Chamar a função correta
+            if (activeMode === 'tempo')    fetchTempo(false);
+            if (activeMode === 'bolsa')    fetchBolsa(false);
+            if (activeMode === 'noticias') fetchNoticias(false);
+        });
+
+        function showInfoPanel(title, html) {
+            infoPanelTitle.textContent = title;
+            infoPanelBody.innerHTML = html;
+            infoPanel.classList.add('show');
+            ipc.send('set-mouse-passthrough', false);
+        }
+
+        function infoLoading(title) {
+            showInfoPanel(title, '<div class="info-loading">⏳ A carregar...</div>');
+        }
+
+        function infoError(title, msg) {
+            showInfoPanel(title, `<div class="info-error">❌ ${msg}</div>`);
+        }
+
+        // ── TEMPO ──────────────────────────────────────────────────
+        async function fetchTempo(showLoading = true) {
+            if (showLoading) infoLoading('☁️ Tempo em Lisboa');
+            startAutoRefresh('tempo', () => fetchTempo(false));
+            try {
+                // Open-Meteo — Lisboa: lat 38.717, lon -9.142
+                const url = 'https://api.open-meteo.com/v1/forecast' +
+                    '?latitude=38.717&longitude=-9.142' +
+                    '&current=temperature_2m,apparent_temperature,relative_humidity_2m,' +
+                    'precipitation,wind_speed_10m,wind_direction_10m,weathercode' +
+                    '&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode' +
+                    '&timezone=Europe%2FLisbon&forecast_days=4';
+
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const d = await res.json();
+                const c = d.current;
+
+                const WMO = {
+                    0:'☀️ Céu limpo', 1:'🌤️ Pouco nublado', 2:'⛅ Parcialmente nublado',
+                    3:'☁️ Nublado', 45:'🌫️ Nevoeiro', 48:'🌫️ Nevoeiro com gelo',
+                    51:'🌦️ Chuvisco leve', 53:'🌦️ Chuvisco', 55:'🌧️ Chuvisco forte',
+                    61:'🌧️ Chuva fraca', 63:'🌧️ Chuva moderada', 65:'🌧️ Chuva forte',
+                    71:'❄️ Neve fraca', 73:'❄️ Neve', 75:'❄️ Neve forte',
+                    80:'🌦️ Aguaceiros', 81:'🌦️ Aguaceiros moderados', 82:'⛈️ Aguaceiros fortes',
+                    95:'⛈️ Trovoada', 96:'⛈️ Trovoada com granizo', 99:'⛈️ Trovoada forte'
+                };
+
+                const cond = WMO[c.weathercode] || '🌡️ Condição desconhecida';
+                const windDir = ['N','NE','E','SE','S','SO','O','NO'][Math.round(c.wind_direction_10m / 45) % 8];
+
+                // Previsão 4 dias
+                const dias = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+                let forecastHTML = '';
+                for (let i = 0; i < 4; i++) {
+                    const dt  = new Date(d.daily.time[i]);
+                    const dia = i === 0 ? 'Hoje' : i === 1 ? 'Amanhã' : dias[dt.getDay()];
+                    const dc  = WMO[d.daily.weathercode[i]]?.split(' ').slice(0,1).join('') || '🌡️';
+                    forecastHTML += `<div class="info-row">
+                        <span class="info-label">${dia}</span>
+                        <span>${dc} ${d.daily.temperature_2m_min[i].toFixed(0)}° / <b>${d.daily.temperature_2m_max[i].toFixed(0)}°C</b></span>
+                    </div>`;
+                }
+
+                showInfoPanel('☁️ Tempo em Lisboa', `
+                    <div class="info-row">
+                        <span class="info-label">Condição</span>
+                        <span class="info-value">${cond}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Temperatura</span>
+                        <span class="info-value">${c.temperature_2m.toFixed(1)}°C</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Sensação</span>
+                        <span class="info-value">${c.apparent_temperature.toFixed(1)}°C</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Humidade</span>
+                        <span class="info-value">${c.relative_humidity_2m}%</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Vento</span>
+                        <span class="info-value">${c.wind_speed_10m.toFixed(1)} km/h ${windDir}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Precipitação</span>
+                        <span class="info-value">${c.precipitation} mm</span>
+                    </div>
+                    <div class="info-section-title">📅 Próximos dias</div>
+                    ${forecastHTML}
+                `);
+                showMessage(`${cond} · ${c.temperature_2m.toFixed(0)}°C em Lisboa 🌡️`);
+            } catch(err) {
+                infoError('☁️ Tempo em Lisboa', `Não consegui obter o tempo.<br><small>${err.message}</small>`);
+                showMessage("Não consegui obter o tempo 😿");
+            }
+        }
+
+        // ── BOLSA ──────────────────────────────────────────────────
+        // API: Yahoo Finance (sem chave necessária)
+        async function fetchBolsa(showLoading = true) {
+            if (showLoading) infoLoading('📈 Mercados');
+            startAutoRefresh('bolsa', () => fetchBolsa(false));
+            const ativos = [
+                { sym: 'BTC-USD',  nome: '₿ Bitcoin',     tipo: 'cripto' },
+                { sym: 'ETH-USD',  nome: '⟠ Ethereum',    tipo: 'cripto' },
+                { sym: '^GSPC',    nome: '📊 S&P 500',     tipo: 'index'  },
+                { sym: '^IXIC',    nome: '📊 NASDAQ',      tipo: 'index'  },
+                { sym: 'EURUSD=X', nome: '💶 EUR/USD',     tipo: 'forex'  },
+                { sym: 'GC=F',     nome: '🥇 Ouro',        tipo: 'commod' },
+            ];
+
+            try {
+                const resultados = await Promise.all(ativos.map(async (a) => {
+                    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(a.sym)}?interval=1d&range=2d`;
+                    const r = await fetch(url);
+                    if (!r.ok) throw new Error(`HTTP ${r.status} para ${a.sym}`);
+                    const j = await r.json();
+                    const meta  = j.chart.result[0].meta;
+                    const price = meta.regularMarketPrice;
+                    const prev  = meta.chartPreviousClose || meta.previousClose;
+                    const pct   = prev ? ((price - prev) / prev * 100) : 0;
+                    const up    = pct >= 0;
+
+                    // Formatar valor
+                    let valor;
+                    if (a.tipo === 'cripto') valor = price.toLocaleString('pt-PT', {minimumFractionDigits:0, maximumFractionDigits:0}) + ' $';
+                    else if (a.tipo === 'forex') valor = price.toFixed(4);
+                    else if (a.tipo === 'commod') valor = price.toLocaleString('pt-PT', {minimumFractionDigits:0, maximumFractionDigits:0}) + ' $';
+                    else valor = price.toLocaleString('pt-PT', {minimumFractionDigits:0, maximumFractionDigits:0});
+
+                    return { ...a, valor, pct, up };
+                }));
+
+                const rows = resultados.map(r => `
+                    <div class="info-row">
+                        <span class="info-label">${r.nome}</span>
+                        <span>
+                            <span class="info-value">${r.valor}</span>
+                            <span class="${r.up ? 'info-up' : 'info-down'}" style="margin-left:6px;font-size:11px">
+                                ${r.up ? '▲' : '▼'} ${Math.abs(r.pct).toFixed(2)}%
+                            </span>
+                        </span>
+                    </div>`).join('');
+
+                const btc = resultados[0];
+                showInfoPanel('📈 Mercados', rows);
+                showMessage(`BTC ${btc.valor} ${btc.up ? '▲' : '▼'}${Math.abs(btc.pct).toFixed(2)}% 📈`);
+            } catch(err) {
+                infoError('📈 Mercados', `Não consegui obter cotações.<br><small>${err.message}</small>`);
+                showMessage("Não consegui obter a bolsa 😿");
+            }
+        }
+
+        // ── NOTÍCIAS ───────────────────────────────────────────────
+        // RSS feeds PT — fetch direto (Electron não tem restrições CORS)
+        async function fetchNoticias(showLoading = true) {
+            if (showLoading) infoLoading('📰 Notícias');
+            startAutoRefresh('noticias', () => fetchNoticias(false));
+
+            // Múltiplos feeds por ordem de preferência
+            const feeds = [
+                { url: 'https://feeds.feedburner.com/sapo-noticias',      nome: 'SAPO Notícias' },
+                { url: 'https://www.dn.pt/arc/outboundfeeds/rss/',         nome: 'Diário de Notícias' },
+                { url: 'https://rss.rtp.pt/www/?rss=noticias',             nome: 'RTP Notícias' },
+                { url: 'https://www.publico.pt/api/rss',                   nome: 'Público' },
+                { url: 'https://feeds.bbci.co.uk/portuguese/rss.xml',      nome: 'BBC Portugal' },
+                { url: 'https://www.jn.pt/arc/outboundfeeds/rss/',         nome: 'Jornal de Notícias' },
+                { url: 'https://observador.pt/feed/',                      nome: 'Observador' },
+            ];
+
+            for (const feed of feeds) {
+                try {
+                    const controller = new AbortController();
+                    const timeout = setTimeout(() => controller.abort(), 7000);
+
+                    // Fetch direto — Electron não precisa de proxy CORS
+                    const res = await fetch(feed.url, {
+                        signal: controller.signal,
+                        headers: { 'Accept': 'application/rss+xml, application/xml, text/xml, */*' }
+                    });
+                    clearTimeout(timeout);
+
+                    if (!res.ok) continue;
+
+                    const text = await res.text();
+                    if (!text || text.length < 200) continue;
+
+                    const parser = new DOMParser();
+                    const doc    = parser.parseFromString(text, 'text/xml');
+
+                    // Verificar se o XML parseou corretamente
+                    const parseError = doc.querySelector('parsererror');
+                    if (parseError) continue;
+
+                    const items = Array.from(doc.querySelectorAll('item')).slice(0, 8);
+                    if (items.length === 0) continue;
+
+                    const html = items.map(item => {
+                        // Título — limpar CDATA e entidades HTML
+                        let title = item.querySelector('title')?.textContent?.trim() || '';
+                        title = title
+                            .replace(/<!\[CDATA\[|\]\]>/g, '')
+                            .replace(/&amp;/g, '&')
+                            .replace(/&lt;/g, '<')
+                            .replace(/&gt;/g, '>')
+                            .replace(/&quot;/g, '"')
+                            .replace(/&#39;/g, "'")
+                            .trim();
+                        if (!title) return '';
+                        return `<div class="news-item">
+                            <div class="news-title">${title}</div>
+                            <div class="news-src">${feed.nome}</div>
+                        </div>`;
+                    }).filter(Boolean).join('');
+
+                    if (!html) continue;
+
+                    showInfoPanel('📰 Notícias', html);
+                    showMessage(`${items.length} notícias do ${feed.nome} 📰`);
+                    return; // sucesso
+
+                } catch(e) {
+                    // timeout ou erro de rede — tentar próximo
+                    continue;
+                }
+            }
+
+            // Nenhum feed funcionou
+            infoError('📰 Notícias', 'Não foi possível carregar notícias.<br><small>Verifica a ligação à internet.</small>');
+            showMessage("Não consegui carregar notícias 😿");
+        }
+
+    </script>
+</body></html>
